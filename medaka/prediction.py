@@ -74,6 +74,12 @@ def run_prediction(
                     mbases_done / total_region_mbases, mbases_done,
                     total_region_mbases, t1 - t0))
 
+
+        t11 = now()
+        baseline_time = (t11-t0)
+
+    logger.info("Baseline throughput: {} Mbases/s.".format(mbases_done / baseline_time))
+
     remainder_regions = loader.remainders
     logger.info("Processed {} batches".format(n_batches))
     logger.info("All done, {} remainder regions.".format(
@@ -148,6 +154,22 @@ def predict(args):
             args.full_precision = True
 
         model = model_store.load_model(device=device)
+
+    # print model parameters
+    total_params = sum(p.numel() for p in model.parameters())
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    
+    logger.info("Total parameters: {:,}".format(total_params))
+    logger.info("Total trainable parameters: {:,}".format(trainable_params))
+    
+    # print layer-wise parameters
+    logger.info("Layer-wise parameters:")
+    for name, module in model.named_children():
+        params = sum(p.numel() for p in module.parameters())
+        logger.info(f"  {name}: {params:,} parameters")
+
+    from torchsummary import summary
+    summary(model, (12800, 10))
 
     logger.info("Model device: {}".format(model.device()))
     if args.full_precision:
