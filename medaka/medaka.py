@@ -261,7 +261,7 @@ def _region_ref_names():
     return parser
 
 
-def _chunking_feature_args(batch_size=100, chunk_len=10000, chunk_ovlp=1000):
+def _chunking_feature_args(batch_size=100, chunk_len=2048, chunk_ovlp=128):
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False)
     parser.add_argument('--batch_size', type=int, default=batch_size, help='Inference batch size.')
